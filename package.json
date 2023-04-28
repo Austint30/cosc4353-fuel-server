@@ -7,7 +7,8 @@
     "deploy": "cd ./src && npm run deploy",
     "logs": "cd ./src && npm run logs",
     "test": "cd ./src && npm run test",
-    "test:watch": "cd ./src && npm run test:watch"
+    "test:watch": "cd ./src && npm run test:watch",
+    "coverage": "cd ./src && npm run coverage"
   },
   "private": true,
   "dependencies": {
