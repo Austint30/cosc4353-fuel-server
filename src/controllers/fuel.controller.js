@@ -72,9 +72,14 @@ exports.getFuelQuote = async (docID) => {
 }
 
 exports.listFuelQuotes = async (uuid) => {
-    let snapshot = await quoteColl.where('__name__', '>=', uuid).get();
+    let snapshot = await quoteColl.where('name', '<=', uuid).get();
 
-    let docs = [];
-    snapshot.forEach(doc => docs.push(doc.data()));
+
+    // Filter the documents by ID and uuid
+    let docs = snapshot.docs.filter(doc => {
+        let docUuid = doc.id.split('::')[0];
+        return docUuid === uuid && doc.data().id.split('::')[0] === uuid;
+    }).map(doc => doc.data());
+
     return docs;
 }
