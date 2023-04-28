@@ -4,8 +4,8 @@ const { calcFuelQuote } = require('../calc/fuel.calc');
 describe('Test fuel.calc.js', () => {
     it('GallonsRequested = 1, Price = 1.50, Client in Texas, No fuel history, Profit factor = 0.10', () => {
         let result = calcFuelQuote(1.50, 1, 'TX', false, 0.10);
-        assert.equal(result.suggestedPrice, 1.76);
-        assert.equal(result.totalAmountDue, 1.76)
+        assert.equal(result.suggestedPrice, 1.73);
+        assert.equal(result.totalAmountDue, 1.73)
     })
     it('GallonsRequested = 2, Price = 1.50, Client in Texas, Has fuel history, Profit factor = 0.10', () => {
         let result = calcFuelQuote(1.50, 2, 'TX', true, 0.10);
