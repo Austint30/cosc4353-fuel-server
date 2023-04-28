@@ -3,8 +3,7 @@ const db = require('../services/db.service');
 let quoteColl = db.collection('fuel-quotes');
 const users = require('../controllers/user.controller');
 
-exports.buildFuelQuote = async (userUUID, { gallonsRequested, deliveryDate, deliveryAddress, id }) => {
-
+exports.calcFuelPrice = async (userUUID, gallonsRequested) => {
     let quotes = await this.listFuelQuotes(userUUID);
     let user = await users.getUser(userUUID);
 
@@ -14,11 +13,16 @@ exports.buildFuelQuote = async (userUUID, { gallonsRequested, deliveryDate, deli
     let rateHistoryFactor = quotes.length > 0 ? true : false;
     let companyProfitFactor = 0.10; // Hardcoded to 10% for now.
 
-    let quote = calcFuelQuote(
+    return calcFuelQuote(
         currentPricePerGal, gallonsRequested,
         locationFactor, rateHistoryFactor,
         companyProfitFactor
     );
+}
+
+exports.buildFuelQuote = async (userUUID, { gallonsRequested, deliveryDate, deliveryAddress, id }) => {
+
+    let quote = await this.calcFuelPrice(userUUID);
 
     return {
         ...quote,
@@ -72,7 +76,10 @@ exports.getFuelQuote = async (docID) => {
 }
 
 exports.listFuelQuotes = async (uuid) => {
-    let snapshot = await quoteColl.where('__name__', '>=', uuid).get();
+    let snapshot = await quoteColl
+        .where('__name__', '>=', uuid)
+        .where('__name__', '<', uuid + '\ufff0')
+        .get();
 
     let docs = [];
     snapshot.forEach(doc => docs.push(doc.data()));

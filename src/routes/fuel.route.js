@@ -5,7 +5,7 @@ const fuelForm = require('../controllers/fuel.controller');
 const { body, validationResult } = require('express-validator');
 const { getUserUUID, getUserProfile } = require('../util/auth');
 const { ForbiddenMessage } = require('../model/responses');
-const { calcFuelQuote } = require('../calc/fuel.calc');
+const { toCentralIsoFormat } = require('../util/date');
 
 const validate = (method) => {
   switch (method) {
@@ -13,19 +13,21 @@ const validate = (method) => {
     case 'createForm': {
      return [
         body('deliveryDate', 'Delivery Date is required').exists().trim(),
-        body('deliveryDate', 'Delivery Date is required').isISO8601().toDate(),
-        body('gallonsRequested', 'Gallons Requested is required').exists().toFloat()
+        body('deliveryDate', 'Delivery Date is required').isISO8601().toDate().isAfter(toCentralIsoFormat(new Date())),
+        body('gallonsRequested', 'Gallons Requested is required').exists().toFloat().isFloat({ min: 0 })
        ]   
     }
     case 'calculate':
       return [
-        body('gallonsRequested', 'Gallons Requested is required').exists().toFloat()
+        body('deliveryDate', 'Delivery Date is required').exists().trim(),
+        body('deliveryDate', 'Delivery Date is required').isISO8601().toDate().isAfter(toCentralIsoFormat(new Date())),
       ]
   }
 }
 
 router.post('/quote/calculate', validate('calculate'), async (request, response, next) => {
-  let result = calcFuelQuote(request.body.gallonsRequested, fuelForm.getFuelPrice());
+  let uuid = await getUserUUID(request, response);
+  let result =  await fuelForm.calcFuelPrice(uuid, gallonsRequested);
   response.json(result);
 })
 
