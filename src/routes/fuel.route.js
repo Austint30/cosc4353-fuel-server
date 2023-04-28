@@ -5,7 +5,7 @@ const fuelForm = require('../controllers/fuel.controller');
 const { body, validationResult } = require('express-validator');
 const { getUserUUID, getUserProfile } = require('../util/auth');
 const { ForbiddenMessage } = require('../model/responses');
-const { toCentralIsoFormat } = require('../util/date');
+const { toCentralIsoFormat, addDays } = require('../util/date');
 
 const validate = (method) => {
   switch (method) {
@@ -13,21 +13,24 @@ const validate = (method) => {
     case 'createForm': {
      return [
         body('deliveryDate', 'Delivery Date is required').exists().trim(),
-        body('deliveryDate', 'Delivery Date is required').isISO8601().toDate().isAfter(toCentralIsoFormat(new Date())),
-        body('gallonsRequested', 'Gallons Requested is required').exists().toFloat().isFloat({ min: 0 })
+        body('deliveryDate', 'Delivery Date in the incorrect format').isISO8601().toDate(),
+        body('deliveryDate', 'Delivery Date cannot be a date in the past').toDate().isAfter(toCentralIsoFormat(addDays(new Date(), -1))),
+        body('gallonsRequested', 'Gallons Requested is required').exists().toFloat(),
+        body('gallonsRequested', 'Gallons Requested must be greater than 0').isFloat({ min: 0 })
        ]   
     }
     case 'calculate':
       return [
         body('deliveryDate', 'Delivery Date is required').exists().trim(),
-        body('deliveryDate', 'Delivery Date is required').isISO8601().toDate().isAfter(toCentralIsoFormat(new Date())),
+        body('deliveryDate', 'Delivery Date in the incorrect format').isISO8601().toDate(),
+        body('deliveryDate', 'Delivery Date cannot by a date in the past').isAfter(toCentralIsoFormat(new Date())),
       ]
   }
 }
 
 router.post('/quote/calculate', validate('calculate'), async (request, response, next) => {
   let uuid = await getUserUUID(request, response);
-  let result =  await fuelForm.calcFuelPrice(uuid, gallonsRequested);
+  let result =  await fuelForm.calcFuelPrice(uuid, request.body.gallonsRequested);
   response.json(result);
 })
 

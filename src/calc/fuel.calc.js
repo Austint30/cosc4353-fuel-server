@@ -73,9 +73,11 @@ exports.calcFuelQuote = (currentPricePerGal, gallonsRequested, locationFactor, r
         }
     }
 
+    let totalAmountDue = Number(gallonsRequested) * suggestedPrice;
+    totalAmountDue = Math.round(totalAmountDue * 100) / 100;
+
     return {
         suggestedPrice: suggestedPrice,
-        // totalAmountDue: Number(gallonsRequested) * currentPricePerGal // CHANGED
-        totalAmountDue: Number(gallonsRequested) * suggestedPrice
+        totalAmountDue: totalAmountDue
     }
 }

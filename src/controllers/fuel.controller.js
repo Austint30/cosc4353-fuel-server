@@ -22,7 +22,7 @@ exports.calcFuelPrice = async (userUUID, gallonsRequested) => {
 
 exports.buildFuelQuote = async (userUUID, { gallonsRequested, deliveryDate, deliveryAddress, id }) => {
 
-    let quote = await this.calcFuelPrice(userUUID);
+    let quote = await this.calcFuelPrice(userUUID, gallonsRequested);
 
     return {
         ...quote,
