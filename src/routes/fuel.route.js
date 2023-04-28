@@ -16,7 +16,7 @@ const validate = (method) => {
         body('deliveryDate', 'Delivery Date in the incorrect format').isISO8601().toDate(),
         body('deliveryDate', 'Delivery Date cannot be a date in the past').toDate().isAfter(toCentralIsoFormat(addDays(new Date(), -1))),
         body('gallonsRequested', 'Gallons Requested is required').exists().toFloat(),
-        body('gallonsRequested', 'Gallons Requested must be greater than 0').isFloat({ min: 0 })
+        body('gallonsRequested', 'Gallons Requested must be greater than 0').isFloat({ min: 1 })
        ]   
     }
     case 'calculate':
