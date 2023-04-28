@@ -80,7 +80,7 @@ exports.listFuelQuotes = async (uuid) => {
         .where('__name__', '>=', uuid)
         .where('__name__', '<', uuid + '\ufff0')
         .get();
-
+    
     let docs = [];
     snapshot.forEach(doc => docs.push(doc.data()));
     return docs;
